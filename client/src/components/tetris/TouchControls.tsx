@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { useTetris } from '@/lib/tetris/hooks/useTetris';
+import { useTetris } from '@/lib/stores/useTetris';
 import { GameState } from '@/lib/tetris/constants';
 
 interface TouchControlsProps {
@@ -30,14 +29,9 @@ const TouchControls: React.FC<TouchControlsProps> = ({ containerRef }) => {
             minWidth: '200px', 
             minHeight: '60px', 
             WebkitTapHighlightColor: 'rgba(0,0,0,0)',
-            touchAction: 'manipulation',
-            userSelect: 'none'
+            touchAction: 'manipulation'
           }}
           onClick={() => {
-            restart();
-            start();
-          }}
-          onTouchStart={() => {
             restart();
             start();
           }}
@@ -54,16 +48,12 @@ const TouchControls: React.FC<TouchControlsProps> = ({ containerRef }) => {
         <button 
           className="bg-blue-600 text-white px-6 py-3 rounded-lg text-lg font-bold"
           onClick={() => start()}
-          onTouchStart={() => start()}
-          style={{ touchAction: 'manipulation', userSelect: 'none' }}
         >
           Resume
         </button>
         <button 
           className="bg-red-600 text-white px-6 py-3 rounded-lg text-lg font-bold"
           onClick={() => restart()}
-          onTouchStart={() => restart()}
-          style={{ touchAction: 'manipulation', userSelect: 'none' }}
         >
           Restart
         </button>
@@ -72,64 +62,40 @@ const TouchControls: React.FC<TouchControlsProps> = ({ containerRef }) => {
   }
   
   return (
-    <div className="touch-controls grid grid-cols-3 gap-2 mt-4">
-      {/* Left button */}
-      <button
-        className="bg-gray-700 text-white p-4 rounded-lg text-2xl font-bold"
-        onClick={moveLeft}
-        onTouchStart={moveLeft}
-        style={{ touchAction: 'manipulation', userSelect: 'none' }}
-      >
-        ←
-      </button>
-      
-      {/* Down and Rotate buttons */}
-      <div className="flex flex-col gap-2">
-        <button
-          className="bg-gray-700 text-white p-4 rounded-lg text-2xl font-bold"
-          onClick={drop}
-          onTouchStart={drop}
-          style={{ touchAction: 'manipulation', userSelect: 'none' }}
+    <div className="touch-controls flex justify-between mt-4">
+      <div className="flex space-x-2">
+        <button 
+          className="w-14 h-14 bg-gray-800 text-white rounded-full flex items-center justify-center text-2xl border-2 border-white"
+          onTouchStart={() => moveLeft()}
         >
-          ↓
+          ←
         </button>
-        <button
-          className="bg-gray-700 text-white p-4 rounded-lg text-2xl font-bold"
-          onClick={rotateClockwise}
-          onTouchStart={rotateClockwise}
-          style={{ touchAction: 'manipulation', userSelect: 'none' }}
+        <button 
+          className="w-14 h-14 bg-gray-800 text-white rounded-full flex items-center justify-center text-2xl border-2 border-white"
+          onTouchStart={() => moveRight()}
         >
-          ↻
+          →
         </button>
       </div>
       
-      {/* Right button */}
-      <button
-        className="bg-gray-700 text-white p-4 rounded-lg text-2xl font-bold"
-        onClick={moveRight}
-        onTouchStart={moveRight}
-        style={{ touchAction: 'manipulation', userSelect: 'none' }}
-      >
-        →
-      </button>
-      
-      {/* Hard drop and pause buttons */}
-      <div className="col-span-3 grid grid-cols-2 gap-2 mt-2">
-        <button
-          className="bg-yellow-600 text-white p-3 rounded-lg text-lg font-bold"
-          onClick={quickDrop}
-          onTouchStart={quickDrop}
-          style={{ touchAction: 'manipulation', userSelect: 'none' }}
+      <div className="flex space-x-2">
+        <button 
+          className="w-14 h-14 bg-gray-800 text-white rounded-full flex items-center justify-center text-2xl border-2 border-white"
+          onTouchStart={() => drop()}
         >
-          Drop
+          ↓
         </button>
-        <button
-          className="bg-blue-600 text-white p-3 rounded-lg text-lg font-bold"
-          onClick={pause}
-          onTouchStart={pause}
-          style={{ touchAction: 'manipulation', userSelect: 'none' }}
+        <button 
+          className="w-14 h-14 bg-gray-800 text-white rounded-full flex items-center justify-center text-2xl border-2 border-white"
+          onTouchStart={() => rotateClockwise()}
         >
-          Pause
+          ↻
+        </button>
+        <button 
+          className="w-14 h-14 bg-red-600 text-white rounded-full flex items-center justify-center text-md border-2 border-white"
+          onTouchStart={() => pause()}
+        >
+          II
         </button>
       </div>
     </div>

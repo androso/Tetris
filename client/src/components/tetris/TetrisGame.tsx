@@ -142,7 +142,7 @@ const TetrisGame: React.FC = () => {
       {/* Touch controls (mobile only) */}
       <div className="md:hidden w-full mt-4">
         <TouchControls containerRef={containerRef} />
-      </div>iv>
+      </div>
     </div>
   );
 };
