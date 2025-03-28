@@ -2,6 +2,29 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Estilos para mejorar la experiencia táctil */
+.touch-button {
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.2s;
+}
+
+.touch-button:active {
+  transform: scale(0.95);
+}
+
+/* Deshabilitar efectos de arrastre no deseados */
+* {
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+/* Permitir selección de texto en inputs */
+input, textarea {
+  user-select: auto;
+}
+
 @layer base {
   * {
     @apply border-border;
