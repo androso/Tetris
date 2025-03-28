@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import TetrisBoard from './TetrisBoard';
 import NextPiece from './NextPiece';
 import Score from './Score';
@@ -6,14 +6,35 @@ import Controls from './Controls';
 import TouchControls from './TouchControls';
 import { useKeyboardControls } from '@/lib/tetris/hooks/useKeyboardControls';
 import { useTouchControls } from '@/lib/tetris/hooks/useTouchControls';
-import { useGame } from '@/lib/tetris/hooks/useGame';
+import { useTetris } from '@/lib/stores/useTetris';
 import { GameState } from '@/lib/tetris/constants';
 import { useTetrisAudio } from '@/lib/tetris/hooks/useAudio';
 
 const TetrisGame: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const { gameState, startGame, pauseGame, restartGame } = useGame();
+  const { gameState, start, pause, restart, tick } = useTetris();
   const { toggleMute, isMuted } = useTetrisAudio();
+  
+  // Set up game loop using requestAnimationFrame
+  useEffect(() => {
+    let frameId: number;
+    
+    const gameLoop = () => {
+      // Only run tick when game is playing
+      if (gameState === GameState.PLAYING) {
+        tick();
+      }
+      
+      frameId = requestAnimationFrame(gameLoop);
+    };
+    
+    frameId = requestAnimationFrame(gameLoop);
+    
+    // Clean up the animation frame on unmount
+    return () => {
+      cancelAnimationFrame(frameId);
+    };
+  }, [gameState, tick]);
   
   // Set up keyboard controls
   useKeyboardControls();
@@ -41,7 +62,7 @@ const TetrisGame: React.FC = () => {
               <h2 className="text-white text-2xl mb-6">Press ENTER to Start</h2>
               <button 
                 className="bg-blue-600 text-white px-6 py-3 rounded-lg text-xl"
-                onClick={startGame}
+                onClick={start}
               >
                 Start Game
               </button>
@@ -56,13 +77,13 @@ const TetrisGame: React.FC = () => {
               <div className="flex gap-4 justify-center">
                 <button 
                   className="bg-blue-600 text-white px-4 py-2 rounded-lg text-lg"
-                  onClick={startGame}
+                  onClick={start}
                 >
                   Resume
                 </button>
                 <button 
                   className="bg-red-600 text-white px-4 py-2 rounded-lg text-lg"
-                  onClick={restartGame}
+                  onClick={restart}
                 >
                   Restart
                 </button>
@@ -78,8 +99,8 @@ const TetrisGame: React.FC = () => {
               <button 
                 className="bg-blue-600 text-white px-6 py-3 rounded-lg text-lg mt-4"
                 onClick={() => {
-                  restartGame();
-                  startGame();
+                  restart();
+                  start();
                 }}
               >
                 Play Again

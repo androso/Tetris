@@ -50,7 +50,7 @@ export const initializeGame = (): GameStateInterface => {
     board: createEmptyBoard(),
     activePiece,
     activePosition: {
-      x: Math.floor(BOARD_WIDTH / 2) - Math.floor(activePiece.shape[0] / 2),
+      x: Math.floor(BOARD_WIDTH / 2) - Math.floor((activePiece.shape[0] || []).length / 2),
       y: 0
     },
     nextPiece,
@@ -210,7 +210,7 @@ export const moveDown = (gameState: GameStateInterface): GameStateInterface => {
       board: clearedBoard,
       activePiece: isGameOver ? null : gameState.nextPiece,
       activePosition: isGameOver ? activePosition : {
-        x: Math.floor(BOARD_WIDTH / 2) - Math.floor(gameState.nextPiece.shape[0] / 2),
+        x: Math.floor(BOARD_WIDTH / 2) - Math.floor((gameState.nextPiece.shape[0] || []).length / 2),
         y: 0
       },
       nextPiece: isGameOver ? gameState.nextPiece : getRandomTetromino(),
