@@ -5,7 +5,7 @@ import Score from './Score';
 import Controls from './Controls';
 import TouchControls from './TouchControls';
 import { useKeyboardControls } from '@/lib/tetris/hooks/useKeyboardControls';
-import { useTouchControls } from '@/lib/tetris/hooks/useTouchControls';
+import { useTouchControls as useTouchControlsHook } from '@/lib/tetris/hooks/useTouchControls';
 import { useTetris } from '@/lib/stores/useTetris';
 import { GameState } from '@/lib/tetris/constants';
 import { useTetrisAudio } from '@/lib/tetris/hooks/useAudio';
@@ -14,34 +14,34 @@ const TetrisGame: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const { gameState, start, pause, restart, tick } = useTetris();
   const { toggleMute, isMuted } = useTetrisAudio();
-  
+
   // Set up game loop using requestAnimationFrame
   useEffect(() => {
     let frameId: number;
-    
+
     const gameLoop = () => {
       // Only run tick when game is playing
       if (gameState === GameState.PLAYING) {
         tick();
       }
-      
+
       frameId = requestAnimationFrame(gameLoop);
     };
-    
+
     frameId = requestAnimationFrame(gameLoop);
-    
+
     // Clean up the animation frame on unmount
     return () => {
       cancelAnimationFrame(frameId);
     };
   }, [gameState, tick]);
-  
+
   // Set up keyboard controls
   useKeyboardControls();
-  
+
   // Set up touch controls
-  useTouchControls(containerRef);
-  
+  useTouchControlsHook(containerRef);
+
   return (
     <div 
       ref={containerRef}
@@ -51,10 +51,10 @@ const TetrisGame: React.FC = () => {
       <div className="game-area relative">
         {/* Game title */}
         <h1 className="text-center text-3xl text-white mb-4 tracking-wider">TETRIS</h1>
-        
+
         {/* Main game board */}
         <TetrisBoard />
-        
+
         {/* Overlays for different game states */}
         {gameState === GameState.READY && (
           <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-70">
@@ -69,7 +69,7 @@ const TetrisGame: React.FC = () => {
             </div>
           </div>
         )}
-        
+
         {gameState === GameState.PAUSED && (
           <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-70">
             <div className="text-center">
@@ -91,7 +91,7 @@ const TetrisGame: React.FC = () => {
             </div>
           </div>
         )}
-        
+
         {gameState === GameState.GAME_OVER && (
           <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-70">
             <div className="text-center">
@@ -109,14 +109,14 @@ const TetrisGame: React.FC = () => {
           </div>
         )}
       </div>
-      
+
       <div className="game-info flex flex-col gap-6">
         {/* Next piece preview */}
         <NextPiece />
-        
+
         {/* Score, level, and lines */}
         <Score />
-        
+
         {/* Sound toggle */}
         <button 
           className="bg-gray-800 text-white px-4 py-2 rounded-lg text-sm flex items-center justify-center gap-2"
@@ -124,7 +124,7 @@ const TetrisGame: React.FC = () => {
         >
           {isMuted ? "🔇 Sound Off" : "🔊 Sound On"}
         </button>
-        
+
         {/* Game controls for desktop */}
         <div className="hidden md:block">
           <h3 className="text-white text-sm mb-2">CONTROLS</h3>
@@ -138,7 +138,7 @@ const TetrisGame: React.FC = () => {
           </div>
         </div>
       </div>
-      
+
       {/* Touch controls (mobile only) */}
       <div className="md:hidden w-full mt-4">
         <TouchControls containerRef={containerRef} />

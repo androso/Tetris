@@ -1,103 +1,29 @@
 import React from 'react';
-import { useTetris } from '@/lib/stores/useTetris';
-import { GameState } from '@/lib/tetris/constants';
+import { useTetris } from '../../lib/stores/useTetris';
+import { useIsMobile } from '../../hooks/use-is-mobile';
+import { GameState } from '../../lib/tetris/constants';
 
 interface TouchControlsProps {
   containerRef: React.RefObject<HTMLDivElement>;
 }
 
 const TouchControls: React.FC<TouchControlsProps> = ({ containerRef }) => {
-  const {
-    gameState,
-    moveLeft,
-    moveRight,
-    rotateClockwise,
-    drop,
-    quickDrop,
-    start,
-    pause,
-    restart
-  } = useTetris();
-  
-  // Only render controls during gameplay
-  if (gameState === GameState.READY || gameState === GameState.GAME_OVER) {
-    return (
-      <div className="touch-controls flex justify-center mt-4">
-        <button 
-          className="bg-blue-600 text-white px-8 py-4 rounded-lg text-xl font-bold touch-button"
-          style={{ 
-            minWidth: '200px', 
-            minHeight: '60px', 
-            WebkitTapHighlightColor: 'rgba(0,0,0,0)',
-            touchAction: 'manipulation'
-          }}
-          onClick={() => {
-            restart();
-            start();
-          }}
-        >
-          {gameState === GameState.READY ? 'Start Game' : 'Play Again'}
-        </button>
-      </div>
-    );
-  }
-  
-  if (gameState === GameState.PAUSED) {
-    return (
-      <div className="touch-controls flex justify-center mt-4 space-x-4">
-        <button 
-          className="bg-blue-600 text-white px-6 py-3 rounded-lg text-lg font-bold"
-          onClick={() => start()}
-        >
-          Resume
-        </button>
-        <button 
-          className="bg-red-600 text-white px-6 py-3 rounded-lg text-lg font-bold"
-          onClick={() => restart()}
-        >
-          Restart
-        </button>
-      </div>
-    );
-  }
-  
+  const { gameState, start, restart } = useTetris();
+  const isMobile = useIsMobile();
+
+  // Don't render touch controls on desktop
+  if (!isMobile) return null;
+
   return (
-    <div className="touch-controls flex justify-between mt-4">
-      <div className="flex space-x-2">
+    <div className="fixed bottom-4 left-0 right-0 flex justify-center z-10">
+      {(gameState === GameState.IDLE || gameState === GameState.GAME_OVER) && (
         <button 
-          className="w-14 h-14 bg-gray-800 text-white rounded-full flex items-center justify-center text-2xl border-2 border-white"
-          onTouchStart={() => moveLeft()}
+          className="touch-button bg-blue-500 text-white py-3 px-8 rounded-full shadow-lg text-lg font-bold"
+          onClick={gameState === GameState.IDLE ? start : restart}
         >
-          ←
+          {gameState === GameState.IDLE ? 'Start Game' : 'Play Again'}
         </button>
-        <button 
-          className="w-14 h-14 bg-gray-800 text-white rounded-full flex items-center justify-center text-2xl border-2 border-white"
-          onTouchStart={() => moveRight()}
-        >
-          →
-        </button>
-      </div>
-      
-      <div className="flex space-x-2">
-        <button 
-          className="w-14 h-14 bg-gray-800 text-white rounded-full flex items-center justify-center text-2xl border-2 border-white"
-          onTouchStart={() => drop()}
-        >
-          ↓
-        </button>
-        <button 
-          className="w-14 h-14 bg-gray-800 text-white rounded-full flex items-center justify-center text-2xl border-2 border-white"
-          onTouchStart={() => rotateClockwise()}
-        >
-          ↻
-        </button>
-        <button 
-          className="w-14 h-14 bg-red-600 text-white rounded-full flex items-center justify-center text-md border-2 border-white"
-          onTouchStart={() => pause()}
-        >
-          II
-        </button>
-      </div>
+      )}
     </div>
   );
 };
