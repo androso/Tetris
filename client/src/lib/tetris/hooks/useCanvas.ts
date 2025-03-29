@@ -86,13 +86,14 @@ export function drawCell(
 export function drawGrid(
   ctx: CanvasRenderingContext2D,
   width: number,
-  height: number
+  height: number,
+  cellSize: number = CELL_SIZE
 ) {
   // Draw horizontal grid lines
   for (let y = 0; y <= height; y++) {
     ctx.beginPath();
-    ctx.moveTo(0, y * CELL_SIZE);
-    ctx.lineTo(width * CELL_SIZE, y * CELL_SIZE);
+    ctx.moveTo(0, y * cellSize);
+    ctx.lineTo(width * cellSize, y * cellSize);
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
     ctx.stroke();
   }
@@ -100,8 +101,8 @@ export function drawGrid(
   // Draw vertical grid lines
   for (let x = 0; x <= width; x++) {
     ctx.beginPath();
-    ctx.moveTo(x * CELL_SIZE, 0);
-    ctx.lineTo(x * CELL_SIZE, height * CELL_SIZE);
+    ctx.moveTo(x * cellSize, 0);
+    ctx.lineTo(x * cellSize, height * cellSize);
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
     ctx.stroke();
   }
