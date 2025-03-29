@@ -50,8 +50,9 @@ export const TETROMINO_COLORS = {
   Z: '#FF0000'  // Red
 };
 
-// Touch control area sizes
+// Touch control area sizes and timings
 export const TOUCH_CONTROLS = {
   BUTTON_SIZE: 60,
   SWIPE_THRESHOLD: 40,
+  LONG_PRESS_DURATION: 500, // milliseconds for long press to trigger hard drop
 };

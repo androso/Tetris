@@ -6,6 +6,8 @@ interface TouchState {
   startX: number;
   startY: number;
   startTime: number;
+  isLongPress: boolean;
+  hasMovedSignificantly: boolean;
 }
 
 export function useTouchControls(containerRef: React.RefObject<HTMLDivElement>) {
@@ -16,13 +18,25 @@ export function useTouchControls(containerRef: React.RefObject<HTMLDivElement>) 
     rotateClockwise,
     drop,
     quickDrop,
-    start,
-    pause,
-    restart
   } = useTetris();
   
   const touchStateRef = useRef<TouchState | null>(null);
   const lastMoveTimeRef = useRef<number>(0);
+  const longPressTimerRef = useRef<number | null>(null);
+  
+  // Function to handle long press completion
+  const handleLongPress = useCallback(() => {
+    if (gameState === GameState.PLAYING && touchStateRef.current) {
+      // Only perform hard drop if the touch hasn't moved significantly
+      if (!touchStateRef.current.hasMovedSignificantly) {
+        touchStateRef.current.isLongPress = true;
+        quickDrop();
+      }
+      
+      // Clear the timer reference
+      longPressTimerRef.current = null;
+    }
+  }, [gameState, quickDrop]);
   
   // Handle touch start
   const handleTouchStart = useCallback((e: TouchEvent) => {
@@ -34,12 +48,24 @@ export function useTouchControls(containerRef: React.RefObject<HTMLDivElement>) 
     touchStateRef.current = {
       startX: touch.clientX,
       startY: touch.clientY,
-      startTime: Date.now()
+      startTime: Date.now(),
+      isLongPress: false,
+      hasMovedSignificantly: false
     };
+    
+    // Start the long press timer
+    if (longPressTimerRef.current !== null) {
+      window.clearTimeout(longPressTimerRef.current);
+    }
+    
+    longPressTimerRef.current = window.setTimeout(
+      handleLongPress,
+      TOUCH_CONTROLS.LONG_PRESS_DURATION
+    );
     
     // Prevent default scrolling
     e.preventDefault();
-  }, [gameState]);
+  }, [gameState, handleLongPress]);
   
   // Handle touch move
   const handleTouchMove = useCallback((e: TouchEvent) => {
@@ -52,6 +78,17 @@ export function useTouchControls(containerRef: React.RefObject<HTMLDivElement>) 
     
     const deltaX = currentX - startX;
     const deltaY = currentY - startY;
+    
+    // Check if touch has moved significantly
+    if (Math.abs(deltaX) > 20 || Math.abs(deltaY) > 20) {
+      touchStateRef.current.hasMovedSignificantly = true;
+      
+      // Cancel long press timer if touch moves significantly
+      if (longPressTimerRef.current !== null) {
+        window.clearTimeout(longPressTimerRef.current);
+        longPressTimerRef.current = null;
+      }
+    }
     
     const currentTime = Date.now();
     
@@ -89,11 +126,19 @@ export function useTouchControls(containerRef: React.RefObject<HTMLDivElement>) 
   const handleTouchEnd = useCallback((e: TouchEvent) => {
     if (!touchStateRef.current || gameState !== GameState.PLAYING) return;
     
+    // Clear any pending long press timer
+    if (longPressTimerRef.current !== null) {
+      window.clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+    
     const endTime = Date.now();
     const touchDuration = endTime - touchStateRef.current.startTime;
     
-    // Detect tap (for rotation)
-    if (touchDuration < 300 && 
+    // Detect tap for rotation (only if not a long press and hasn't moved significantly)
+    if (!touchStateRef.current.isLongPress && 
+        !touchStateRef.current.hasMovedSignificantly &&
+        touchDuration < 300 && 
         Math.abs(e.changedTouches[0].clientX - touchStateRef.current.startX) < 10 &&
         Math.abs(e.changedTouches[0].clientY - touchStateRef.current.startY) < 10) {
       rotateClockwise();
@@ -103,24 +148,6 @@ export function useTouchControls(containerRef: React.RefObject<HTMLDivElement>) 
     e.preventDefault();
   }, [gameState, rotateClockwise]);
   
-  // Handle double tap (for hard drop)
-  const lastTapTimeRef = useRef<number>(0);
-  
-  const handleDoubleTap = useCallback((e: TouchEvent) => {
-    const currentTime = Date.now();
-    const tapLength = currentTime - lastTapTimeRef.current;
-    
-    if (tapLength < 300 && tapLength > 0) {
-      // Double tap detected
-      if (gameState === GameState.PLAYING) {
-        quickDrop();
-      }
-      e.preventDefault();
-    }
-    
-    lastTapTimeRef.current = currentTime;
-  }, [gameState, quickDrop]);
-  
   // Set up event listeners
   useEffect(() => {
     const container = containerRef.current;
@@ -129,20 +156,18 @@ export function useTouchControls(containerRef: React.RefObject<HTMLDivElement>) 
     container.addEventListener('touchstart', handleTouchStart, { passive: false });
     container.addEventListener('touchmove', handleTouchMove, { passive: false });
     container.addEventListener('touchend', handleTouchEnd, { passive: false });
-    container.addEventListener('touchend', handleDoubleTap, { passive: false });
     
     // Clean up
     return () => {
+      // Clear any pending long press timer
+      if (longPressTimerRef.current !== null) {
+        window.clearTimeout(longPressTimerRef.current);
+        longPressTimerRef.current = null;
+      }
+      
       container.removeEventListener('touchstart', handleTouchStart);
       container.removeEventListener('touchmove', handleTouchMove);
       container.removeEventListener('touchend', handleTouchEnd);
-      container.removeEventListener('touchend', handleDoubleTap);
     };
-  }, [
-    containerRef,
-    handleTouchStart,
-    handleTouchMove,
-    handleTouchEnd,
-    handleDoubleTap
-  ]);
+  }, [containerRef, handleTouchStart, handleTouchMove, handleTouchEnd]);
 }

@@ -21,7 +21,7 @@ const TouchControls: React.FC<TouchControlsProps> = ({ containerRef }) => {
           <h3 className="font-bold mb-2">Mobile Controls:</h3>
           <ul className="text-gray-300 text-xs space-y-1">
             <li>👆 Tap: Rotate piece</li>
-            <li>👆👆 Double Tap: Hard drop</li>
+            <li>✋ Long Press: Hard drop</li>
             <li>👈👉 Swipe left/right: Move piece</li>
             <li>👇 Swipe down: Soft drop</li>
           </ul>
