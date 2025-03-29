@@ -63,6 +63,16 @@ const TetrisGame: React.FC = () => {
               <button 
                 className="bg-blue-600 text-white px-6 py-3 rounded-lg text-xl"
                 onClick={start}
+                style={{ touchAction: 'manipulation' }}
+                onTouchStart={(e) => {
+                  // Prevent default behavior to avoid scrolling
+                  e.preventDefault();
+                }}
+                onTouchEnd={(e) => {
+                  // Prevent default and start the game
+                  e.preventDefault();
+                  start();
+                }}
               >
                 Start Game
               </button>
@@ -77,13 +87,23 @@ const TetrisGame: React.FC = () => {
               <div className="flex gap-4 justify-center">
                 <button 
                   className="bg-blue-600 text-white px-4 py-2 rounded-lg text-lg"
-                  onClick={start}
+                  style={{ touchAction: 'manipulation' }}
+                  onTouchStart={(e) => e.preventDefault()}
+                  onTouchEnd={(e) => {
+                    e.preventDefault();
+                    start();
+                  }}
                 >
                   Resume
                 </button>
                 <button 
                   className="bg-red-600 text-white px-4 py-2 rounded-lg text-lg"
-                  onClick={restart}
+                  style={{ touchAction: 'manipulation' }}
+                  onTouchStart={(e) => e.preventDefault()}
+                  onTouchEnd={(e) => {
+                    e.preventDefault();
+                    restart();
+                  }}
                 >
                   Restart
                 </button>
@@ -98,7 +118,14 @@ const TetrisGame: React.FC = () => {
               <h2 className="text-white text-2xl mb-4">GAME OVER</h2>
               <button 
                 className="bg-blue-600 text-white px-6 py-3 rounded-lg text-lg mt-4"
-                onClick={() => {
+                style={{ touchAction: 'manipulation' }}
+                onTouchStart={(e) => {
+                  // Prevent default behavior to avoid scrolling
+                  e.preventDefault();
+                }}
+                onTouchEnd={(e) => {
+                  // Prevent default and restart the game
+                  e.preventDefault();
                   restart();
                   start();
                 }}
@@ -120,7 +147,12 @@ const TetrisGame: React.FC = () => {
         {/* Sound toggle */}
         <button 
           className="bg-gray-800 text-white px-4 py-2 rounded-lg text-sm flex items-center justify-center gap-2"
-          onClick={toggleMute}
+          style={{ touchAction: 'manipulation' }}
+          onTouchStart={(e) => e.preventDefault()}
+          onTouchEnd={(e) => {
+            e.preventDefault();
+            toggleMute();
+          }}
         >
           {isMuted ? "🔇 Sound Off" : "🔊 Sound On"}
         </button>

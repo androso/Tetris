@@ -26,6 +26,9 @@ export function useTouchControls(containerRef: React.RefObject<HTMLDivElement>) 
   
   // Handle touch start
   const handleTouchStart = useCallback((e: TouchEvent) => {
+    // Only handle game controls if the game is in playing state
+    if (gameState !== GameState.PLAYING) return;
+    
     const touch = e.touches[0];
     
     touchStateRef.current = {
@@ -36,7 +39,7 @@ export function useTouchControls(containerRef: React.RefObject<HTMLDivElement>) 
     
     // Prevent default scrolling
     e.preventDefault();
-  }, []);
+  }, [gameState]);
   
   // Handle touch move
   const handleTouchMove = useCallback((e: TouchEvent) => {
